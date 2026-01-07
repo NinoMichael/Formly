@@ -1,0 +1,21 @@
+{
+    "name": "formly",
+    "version": "1.0.0",
+    "description": "Lightweight, flexible form validation library for front-end apps",
+    "author": "ANDRIAMIHAJA Henintsoa Jerry",
+    "license": "MIT",
+    "keywords": [
+      "form",
+      "validation",
+      "javascript",
+      "frontend",
+      "library"
+    ],
+
+    "scripts": {
+      "build": "rollup -c",
+      "lint": "eslint src/**/*.js",
+      "prepublishOnly": "npm test && npm run build"
+    }
+}
+  
