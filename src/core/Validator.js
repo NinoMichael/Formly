@@ -46,9 +46,9 @@ export class Validator {
     }
 
     // Match format validator
-    static match(value1, value2) {
-        return value1 === value2;
-    }
+    static match(value, otherFieldName, context) {
+        return value === context.values[otherFieldName];
+    }    
 
     // Custom rule addition
     static addRule(name, fn) {

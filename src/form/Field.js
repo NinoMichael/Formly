@@ -21,7 +21,7 @@
  * ==========================================================
 */
 
-import { rules } from "../validator/Rules";
+import { rules } from "../core/Rules";
 
 export function createField(name, fieldRules = []) {
     return {
@@ -37,17 +37,27 @@ export function createField(name, fieldRules = []) {
 
             // Iterate over each validation rule
             for (const rule of this.rules) {
-                let ruleName;
-                let params = [];
+                let ruleName, params = [], message;
 
                 // Handle simple rules defined as strings (e.g. "required")
                 if (typeof rule === 'string') {
                     ruleName = rule;
+                    message = `${this.name} is invalid`;
                 }
                 // Handle parameterized rules defined as objects (e.g. { minLength: 8 })
                 else if (typeof rule === 'object') {
                     ruleName = Object.keys(rule)[0];
-                    params = [rule[ruleName]];
+                    const ruleValue = rule[ruleName];
+
+                    if (Array.isArray(ruleValue)) {
+                        params = [ruleValue[0]];
+                        message = ruleValue[1] || `${this.name} failed ${ruleName}`;
+                    } else if (typeof ruleValue === 'string') {
+                        message = ruleValue;
+                    } else {
+                        params = [ruleValue];
+                        message = `${this.name} failed ${ruleName}`;
+                    }
                 }
 
                 // Retrieve the validator function from the Rules proxy
@@ -62,7 +72,7 @@ export function createField(name, fieldRules = []) {
                 // Stop validation on first failure (fail-fast strategy)
                 if (!valid) {
                     this.isValid = false;
-                    this.errors.push(`${this.name} failed ${ruleName}`);
+                    this.errors.push(message);
                     break;
                 }
             }
