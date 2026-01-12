@@ -21,7 +21,7 @@
  * ==========================================================
 */
 
-import { rules } from "../core/Rules";
+import { rules } from "../core/Rules.js";
 
 export function createField(name, fieldRules = []) {
     return {

@@ -9,7 +9,7 @@
  * ==========================================================
 */
 
-import { Validator } from "./Validator";
+import { Validator } from "./Validator.js";
 
 export const rules = new Proxy({}, {
     get: (target, prop) => {

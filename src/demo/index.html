@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Formly – Validation Test</title>
+
+    <style>
+        :root {
+            --bg: #0f1115;
+            --card: #151821;
+            --border: #242836;
+            --text: #edeff5;
+            --muted: #aaafbe;
+            --green: #32d583;
+            --red: #f97066;
+            --focus: #3ef2a3;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #151821, var(--bg));
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0,0,0,.5);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            letter-spacing: .5px;
+        }
+
+        p {
+            margin: 0 0 24px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: transparent;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            color: var(--text);
+            outline: none;
+            transition: border .2s, box-shadow .2s;
+        }
+
+        input:focus {
+            border-color: var(--focus);
+            box-shadow: 0 0 0 3px rgba(62, 242, 163, .15);
+        }
+
+        input.invalid {
+            border-color: var(--red);
+        }
+
+        .error {
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--red);
+        }
+
+        button {
+            margin-top: 16px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--green), #1fa971);
+            color: #062d1b;
+            font-weight: 600;
+            letter-spacing: .4px;
+            transition: transform .1s, box-shadow .1s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(50,213,131,.35);
+        }
+
+        .success {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--green);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="card">
+    <h1>Formly Demo</h1>
+    <p>Frontend validation</p>
+
+    <form id="form">
+        <div class="field">
+            <label>Email</label>
+            <input type="email" id="email" />
+            <div class="error" id="email-error"></div>
+        </div>
+
+        <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" id="password" />
+            <div class="error" id="password-error"></div>
+        </div>
+
+        <div class="field">
+            <label>Confirmation</label>
+            <input type="password" id="confirmPassword" />
+            <div class="error" id="confirmPassword-error"></div>
+        </div>
+
+        <button type="submit">Valider</button>
+        <div class="success" id="success"></div>
+    </form>
+</div>
+
+<script type="module">
+    import { createFormly } from "../form/Form.js";
+
+    /**
+     * 1️⃣ Déclaration du schema uniquement
+     */
+    const schema = {
+        email: {
+            rules: [
+                "required",
+                { email: "Adresse email invalide" }
+            ]
+        },
+        password: {
+            rules: [
+                "required",
+                { password: "Le mot de passe doit contenir minimum 8 caractères, un chiffre, une majuscule et un caractère spécial" }
+            ]
+        },
+        confirmPassword: {
+            rules: [
+                { match: ["password", "Les mots de passe ne correspondent pas"] }
+            ]
+        }
+    };
+
+    /**
+     * 2️⃣ Création du form après le schema
+     */
+    const form = createFormly(schema);
+
+    const inputs = {
+        email: document.getElementById("email"),
+        password: document.getElementById("password"),
+        confirmPassword: document.getElementById("confirmPassword")
+    };
+
+    /**
+     * 3️⃣ Binding inputs → form
+     */
+    Object.keys(inputs).forEach(name => {
+        inputs[name].addEventListener("input", async e => {
+            form[name].value = e.target.value;
+            await form[name].validate();
+            renderField(name);
+        });
+    });
+
+    function renderField(name) {
+        const input = inputs[name];
+        const errorEl = document.getElementById(`${name}-error`);
+        const errors = form[name].errors;
+
+        if (errors.length) {
+            input.classList.add("invalid");
+            errorEl.textContent = errors[0];
+        } else {
+            input.classList.remove("invalid");
+            errorEl.textContent = "";
+        }
+    }
+
+    /**
+     * 4️⃣ Submit global
+     */
+     document.getElementById("form").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        // 🔴 Synchronisation obligatoire des valeurs
+        Object.keys(inputs).forEach(name => {
+            form[name].value = inputs[name].value;
+        });
+
+        const result = await form.validate();
+
+        // 🔴 forEach correct
+        Object.keys(inputs).forEach(name => renderField(name));
+
+        document.getElementById("success").textContent =
+            result.isValid ? "Formulaire valide ✅" : "";
+    });
+</script>
+</body>
+</html>

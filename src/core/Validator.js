@@ -31,9 +31,9 @@ export class Validator {
 
     // Standard password format validator
     static password(value) {
-        const regex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+        const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&+*])[A-Za-z\d!@#$%^&+*]{8,24}$/;
         return regex.test(value);
-    }
+    }    
 
     // Min length format validator
     static minLength(value, length) {

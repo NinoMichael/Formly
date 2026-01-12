@@ -12,7 +12,7 @@
  * ==========================================================
 */
 
-import { createField } from "./Field";
+import { createField } from "./Field.js";
 
 export function createFormly(schema = {}) {
 
